@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using KaizenEngine.GameInput;
+using KaizenEngine.Sprites;
 
 namespace KaizenEngine
 {
@@ -14,22 +15,32 @@ namespace KaizenEngine
         private GraphicsDeviceManager graphics;
         private GameInputManager inputManager;
         private SpriteBatch spriteBatch;
+        private SpriteSheetLoader spriteSheetLoader;
+        private SpriteRenderer spriteRenderer;
+
         private Texture2D texture;
         private Vector2 position;
         private float speed;
+        private SpriteSheet sheet;
 
         public TestGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             inputManager = new GameInputManager();
+            spriteSheetLoader = new SpriteSheetLoader(Content);
+
             position = Vector2.Zero;
             speed = 5.0f;
         }
 
         private void Move(float x, float y) {
-            position.X += x * speed;
-            position.Y -= y * speed;    // Y axis is inverted in XNA
+            float speedModule = (float)Math.Sqrt(x * x + y * y);
+            if (speedModule > 0)
+            {
+                position.X += x * speed / speedModule;
+                position.Y -= y * speed / speedModule;    // Y axis is inverted in XNA
+            }
         }
 
         /// <summary>
@@ -62,7 +73,9 @@ namespace KaizenEngine
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            spriteRenderer = new SpriteRenderer(spriteBatch);
 
+            sheet = spriteSheetLoader.Load(@"Sprites\BlackRabite");
             // TODO: use this.Content to load your game content here
         }
 
@@ -109,8 +122,11 @@ namespace KaizenEngine
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            SpriteFrame sprite = sheet.GetSprite("rabite_01");
+
             spriteBatch.Begin();
-            spriteBatch.Draw(texture, position);
+            spriteRenderer.Draw(sprite, position, scale: 3);
+
             spriteBatch.End();
 
             base.Draw(gameTime);
