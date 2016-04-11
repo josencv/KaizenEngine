@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using KaizenEngine.GameInput;
 using KaizenEngine.Sprites;
+using KaizenEngine.Animations;
+using KaizenEngine.States;
 
 namespace KaizenEngine
 {
@@ -18,10 +21,10 @@ namespace KaizenEngine
         private SpriteSheetLoader spriteSheetLoader;
         private SpriteRenderer spriteRenderer;
 
-        private Texture2D texture;
         private Vector2 position;
         private float speed;
         private SpriteSheet sheet;
+        private DrawableStateMachine stateMachine;
 
         public TestGame()
         {
@@ -54,14 +57,6 @@ namespace KaizenEngine
             inputManager.InitializeGameInputs();
             GameInput.GameInput controller = inputManager.GetGameInput(PlayerInputNumber.Player1);
             controller.PlayerMoveSignal += Move;
-
-            texture = new Texture2D(this.GraphicsDevice, 100, 100);
-            Color[] colorData = new Color[100 * 100];
-            for (int i = 0; i < colorData.Length; i++)
-            {
-                colorData[i] = Color.Red;
-            }
-            texture.SetData<Color>(colorData);
             base.Initialize();
         }
 
@@ -76,6 +71,41 @@ namespace KaizenEngine
             spriteRenderer = new SpriteRenderer(spriteBatch);
 
             sheet = spriteSheetLoader.Load(@"Sprites\BlackRabite");
+
+            List<SpriteFrame> spriteList = new List<SpriteFrame>();
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_03));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_04));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_05));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_06));
+            Animation2D animation1 = new Animation2D(spriteList, 1.0f);
+
+            spriteList = new List<SpriteFrame>();
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_01));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_10));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_11));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_12));
+            Animation2D animation2 = new Animation2D(spriteList, 1.0f);
+
+            stateMachine = new DrawableStateMachine(spriteRenderer);
+
+            DrawableState state1 = new DrawableState(animation1);
+            DrawableState state2 = new DrawableState(animation2);
+            StateTransition transition1 = new StateTransition(state1, state2);
+            StateTransition transition2 = new StateTransition(state2, state1);
+            TransitionCondition condition1 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.Equal, "attack", 1);
+            TransitionCondition condition2 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.Equal, "attack", 0);
+            transition1.AddCondition(condition1);
+            transition2.AddCondition(condition2);
+            state1.AddTransition(transition1);
+            state2.AddTransition(transition2);
+
+            stateMachine.AddState(state1);
+            stateMachine.AddState(state2);
+            stateMachine.SetEntryPoint(state1);
+            stateMachine.Start();
+
+            //animator = new Animator(spriteRenderer);
+            //animator.Play(animation, true);
             // TODO: use this.Content to load your game content here
         }
 
@@ -98,19 +128,20 @@ namespace KaizenEngine
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            if (position.X > this.GraphicsDevice.Viewport.Width)
-                position.X = -1 * texture.Width;
+            //if (position.X > this.GraphicsDevice.Viewport.Width)
+            //    position.X = -1 * texture.Width;
 
-            if (position.X < -1 * texture.Width)
-                position.X = this.GraphicsDevice.Viewport.Width;
+            //if (position.X < -1 * texture.Width)
+            //    position.X = this.GraphicsDevice.Viewport.Width;
 
-            if (position.Y > this.GraphicsDevice.Viewport.Height)
-                position.Y = -1 * texture.Height;
+            //if (position.Y > this.GraphicsDevice.Viewport.Height)
+            //    position.Y = -1 * texture.Height;
 
-            if (position.Y < -1 * texture.Height)
-                position.Y = this.GraphicsDevice.Viewport.Height;
+            //if (position.Y < -1 * texture.Height)
+            //    position.Y = this.GraphicsDevice.Viewport.Height;
 
             inputManager.ProcessGameInputs();
+            stateMachine.Update(gameTime, position);
             base.Update(gameTime);
         }
 
@@ -122,11 +153,8 @@ namespace KaizenEngine
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            SpriteFrame sprite = sheet.GetSprite("rabite_01");
-
             spriteBatch.Begin();
-            spriteRenderer.Draw(sprite, position, scale: 3);
-
+            stateMachine.Draw(position);
             spriteBatch.End();
 
             base.Draw(gameTime);
