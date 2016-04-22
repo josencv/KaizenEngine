@@ -7,11 +7,18 @@ using Microsoft.Xna.Framework;
 
 namespace KaizenEngine.Sprites
 {
+    /// <summary>
+    /// Used to load sprite sheets exported from Texture Packer. // TODO: explain with more detail
+    /// </summary>
     class SpriteSheetLoader
     {
         private readonly ContentManager contentManager;
         private char[] invalidLineStartChars = { '#', '\n', '\t', '\r' };
 
+        /// <summary>
+        /// Initializes an instance of the SpriteSheetLoader class
+        /// </summary>
+        /// <param name="contentManager"></param>
         public SpriteSheetLoader(ContentManager contentManager)
         {
             this.contentManager = contentManager;
@@ -48,6 +55,12 @@ namespace KaizenEngine.Sprites
             return sheet;
         }
 
+        /// <summary>
+        /// Creates an sprite frame with the information read from a string line from a Tecture Packer spritesheet text file
+        /// </summary>
+        /// <param name="line">The line to read from</param>
+        /// <param name="texture">The texture of the sprite frame to load</param>
+        /// <returns></returns>
         public SpriteFrame LoadSpriteFromLine(string line, Texture2D texture)
         {
             string[] values = line.Split(';');

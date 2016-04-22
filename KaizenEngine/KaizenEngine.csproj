@@ -45,6 +45,7 @@
     <Compile Include="GameInput\GameInputManager.cs" />
     <Compile Include="GameInput\GamePadInput.cs" />
     <Compile Include="GameInput\KeyboardInput.cs" />
+    <Compile Include="Helpers\VectorMath.cs" />
     <Compile Include="Sprites\SpriteFrame.cs" />
     <Compile Include="Sprites\SpriteRenderer.cs" />
     <Compile Include="Sprites\SpriteSheet.cs" />

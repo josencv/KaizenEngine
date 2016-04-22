@@ -4,6 +4,9 @@ namespace KaizenEngine.States
 {
     enum ConditionOperator { False = 0, True = 1, Greater, Less, Equal, NotEqual, None }
 
+    /// <summary>
+    /// Represents a conditions of a transition, an expression that can be evaluated to true or false
+    /// </summary>
     class TransitionCondition
     {
         public StateMachineFieldType ConditionType { get; set; }
@@ -11,6 +14,14 @@ namespace KaizenEngine.States
         public string FieldName { get; set; }
         public float OperationValue { get; set; }
 
+        /// <summary>
+        /// Initializes an instance of the TransitionCondition class.
+        /// Will throw error if an invalid condition is constructed (e.g. a boolean type condition with a 'greater than' operator is NOT valid)
+        /// </summary>
+        /// <param name="conditionType">The type of the condition</param>
+        /// <param name="conditionOperator">The operator of the condition.</param>
+        /// <param name="fieldName">The name of the state machine field to use in the condition operation</param>
+        /// <param name="operationValue">The value of the right operand of the condition</param>
         public TransitionCondition(StateMachineFieldType conditionType, ConditionOperator conditionOperator, string fieldName, float operationValue)
         {
             ConditionType = conditionType;
@@ -106,7 +117,7 @@ namespace KaizenEngine.States
         /// </summary>
         private void CheckOperationCorrectness()
         {
-            ArgumentException exception;
+            ArgumentException exception = null;
             switch (ConditionType)
             {
                 case StateMachineFieldType.Float:
@@ -140,8 +151,11 @@ namespace KaizenEngine.States
                         exception = new ArgumentException("Invalid condition operator for trigger type (only 'None' is valid)");
                     }
                     break;
-                default:
-                    break;
+            }
+
+            if (exception != null)
+            {
+                throw exception;
             }
         }
 

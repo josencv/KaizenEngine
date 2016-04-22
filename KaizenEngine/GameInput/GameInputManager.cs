@@ -2,15 +2,21 @@
 
 namespace KaizenEngine.GameInput
 {
+    /// <summary>
+    /// Responsible of listening and initializing new inputs to be used in the game
+    /// </summary>
     class GameInputManager
     {
-        private List<GameInput> gameInputs;
+        private List<GameInput> gameInputs;     // List of currently connected / accepted game inputs in the game
 
+        /// <summary>
+        /// Initializes the game input manager
+        /// </summary>
         public void InitializeGameInputs()
         {
             gameInputs = new List<GameInput>();
 
-            GameInput gameInput = new KeyboardInput(PlayerInputNumber.Player1);
+            GameInput gameInput = new KeyboardInput(PlayerIndex.Player1);
             gameInputs.Add(gameInput);
         }
 
@@ -19,12 +25,12 @@ namespace KaizenEngine.GameInput
         /// </summary>
         /// <param name="player">The index of the player to get the input for</param>
         /// <returns></returns>
-        public GameInput GetGameInput(PlayerInputNumber player)
+        public GameInput GetGameInput(PlayerIndex player)
         {
             GameInput match = null;
             foreach (GameInput input in gameInputs)
             {
-                if (input.PlayerInputNumber == player)
+                if (input.PlayerIndex == player)
                 {
                     match = input;
                     break;

@@ -43,6 +43,8 @@ namespace KaizenEngine
             {
                 position.X += x * speed / speedModule;
                 position.Y -= y * speed / speedModule;    // Y axis is inverted in XNA
+                stateMachine.SetFloatField("movementX", x);
+                stateMachine.SetFloatField("movementY", y);
             }
         }
 
@@ -55,7 +57,7 @@ namespace KaizenEngine
         protected override void Initialize()
         {
             inputManager.InitializeGameInputs();
-            GameInput.GameInput controller = inputManager.GetGameInput(PlayerInputNumber.Player1);
+            GameInput.GameInput controller = inputManager.GetGameInput(GameInput.PlayerIndex.Player1);
             controller.PlayerMoveSignal += Move;
             base.Initialize();
         }
@@ -70,6 +72,14 @@ namespace KaizenEngine
             spriteBatch = new SpriteBatch(GraphicsDevice);
             spriteRenderer = new SpriteRenderer(spriteBatch);
 
+            stateMachine = new DrawableStateMachine(spriteRenderer);
+            stateMachine.RegisterBoolField("attack");
+            stateMachine.RegisterFloatField("movementX");
+            stateMachine.RegisterFloatField("movementY");
+
+            TransitionCondition condition1 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.True, "attack", 1);
+            TransitionCondition condition2 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.False, "attack", 0);
+
             sheet = spriteSheetLoader.Load(@"Sprites\BlackRabite");
 
             List<SpriteFrame> spriteList = new List<SpriteFrame>();
@@ -77,31 +87,41 @@ namespace KaizenEngine
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_04));
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_05));
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_06));
-            Animation2D animation1 = new Animation2D(spriteList, 1.0f);
+            Animation2D moveDown = new Animation2D(spriteList, 1.0f);
 
             spriteList = new List<SpriteFrame>();
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_01));
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_10));
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_11));
             spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_12));
-            Animation2D animation2 = new Animation2D(spriteList, 1.0f);
+            Animation2D moveLeft = new Animation2D(spriteList, 1.0f);
 
-            stateMachine = new DrawableStateMachine(spriteRenderer);
+            spriteList = new List<SpriteFrame>();
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_02));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_07));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_08));
+            spriteList.Add(sheet.GetSprite(TexturePackerMonoGameDefinitions.Test.Rabite_09));
+            Animation2D moveUp = new Animation2D(spriteList, 1.0f);
 
-            DrawableState state1 = new DrawableState(animation1);
-            DrawableState state2 = new DrawableState(animation2);
-            StateTransition transition1 = new StateTransition(state1, state2);
-            StateTransition transition2 = new StateTransition(state2, state1);
-            TransitionCondition condition1 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.Equal, "attack", 1);
-            TransitionCondition condition2 = new TransitionCondition(StateMachineFieldType.Bool, ConditionOperator.Equal, "attack", 0);
+            DrawableState moving = new DrawableState(AnimationSelectionType.Directional);
+            moving.AddAnimation(moveLeft);
+            moving.AddAnimation(moveUp);
+            moving.AddAnimation(moveLeft);
+            moving.AddAnimation(moveDown);
+            moving.AddAnimationSelectionField(stateMachine.Fields["movementX"]);
+            moving.AddAnimationSelectionField(stateMachine.Fields["movementY"]);
+            DrawableState state2 = new DrawableState(moveLeft);
+            StateTransition transition1 = new StateTransition(moving, state2);
+            StateTransition transition2 = new StateTransition(state2, moving);
+            
             transition1.AddCondition(condition1);
             transition2.AddCondition(condition2);
-            state1.AddTransition(transition1);
+            moving.AddTransition(transition1);
             state2.AddTransition(transition2);
 
-            stateMachine.AddState(state1);
+            stateMachine.AddState(moving);
             stateMachine.AddState(state2);
-            stateMachine.SetEntryPoint(state1);
+            stateMachine.SetEntryPoint(moving);
             stateMachine.Start();
 
             //animator = new Animator(spriteRenderer);
@@ -127,6 +147,16 @@ namespace KaizenEngine
         {
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            {
+                stateMachine.SetBoolField("attack", true);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.S))
+            {
+                stateMachine.SetBoolField("attack", false);
+            }
 
             //if (position.X > this.GraphicsDevice.Viewport.Width)
             //    position.X = -1 * texture.Width;
