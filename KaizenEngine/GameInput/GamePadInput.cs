@@ -3,20 +3,27 @@ using Microsoft.Xna.Framework.Input;
 
 namespace KaizenEngine.GameInput
 {
+    /// <summary>
+    /// Derived class of the GameInput class. Represents a game input device (i.e. not keyboard, not mouse)
+    /// </summary>
     class GamePadInput : GameInput
     {
-        private GamePadState currentState;
-        private GamePadState previousState;
+        private GamePadState currentState;                                  // Current full state of the input device
+        private GamePadState previousState;                                 // The input state of the previous update cycle
         private Dictionary<Buttons, GameInputButton> buttonMapper;          // GamePad button to GameInputButton mapper dictionary
         private Dictionary<GamePadThumbSticks, GameInputAxis> axisMapper;   // GamePad axis to GameInputAxis plus axis value mapper dictionary
-        private int gamePadInputNumber;
+        private int gamePadInputNumber;                                     // The index of the GamePad input. Used to differentiate connceted external decives from each other. It is NOT the player index.
 
-        public GamePadInput(PlayerInputNumber playerInputNumber, int gamePadInputNumber)
-        : base(GameInputType.GamePad, playerInputNumber)
+        /// <summary>
+        /// Initializes a new instance of the GamePadInput class
+        /// </summary>
+        /// <param name="playerIndex">The index of the player that will own this controller</param>
+        /// <param name="gamePadInputNumber">The index of the GamePad input. Used to differentiate connceted external decives from each other.</param>
+        public GamePadInput(PlayerIndex playerIndex, int gamePadInputNumber)
+        : base(GameInputType.GamePad, playerIndex)
         {
             buttonMapper = new Dictionary<Buttons, GameInputButton>();
             axisMapper = new Dictionary<GamePadThumbSticks, GameInputAxis>();
-            this.playerInputNumber = playerInputNumber;
             this.gamePadInputNumber = gamePadInputNumber;
             RegisterInputs();
         }
@@ -44,6 +51,9 @@ namespace KaizenEngine.GameInput
             buttonMapper.Add(Buttons.DPadRight, GameInputButton.DPadRight);
         }
 
+        /// <summary>
+        /// Updates the GmaeInput state based of this input state
+        /// </summary>
         public override void UpdateState()
         {
             previousState = currentState;

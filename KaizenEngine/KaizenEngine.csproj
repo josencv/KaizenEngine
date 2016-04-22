@@ -38,14 +38,26 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Animations\Animation2D.cs" />
+    <Compile Include="Animations\Animator.cs" />
+    <Compile Include="Constants\BlackRabite.cs" />
     <Compile Include="GameInput\GameInput.cs" />
     <Compile Include="GameInput\GameInputManager.cs" />
     <Compile Include="GameInput\GamePadInput.cs" />
     <Compile Include="GameInput\KeyboardInput.cs" />
+    <Compile Include="Helpers\VectorMath.cs" />
     <Compile Include="Sprites\SpriteFrame.cs" />
     <Compile Include="Sprites\SpriteRenderer.cs" />
     <Compile Include="Sprites\SpriteSheet.cs" />
     <Compile Include="Sprites\SpriteSheetLoader.cs" />
+    <Compile Include="States\DrawableState.cs" />
+    <Compile Include="States\DrawableStateMachine.cs" />
+    <Compile Include="States\State.cs" />
+    <Compile Include="States\StateMachine.cs" />
+    <Compile Include="States\StateMachineField.cs" />
+    <Compile Include="States\StateMachineSnapshot.cs" />
+    <Compile Include="States\StateTransition.cs" />
+    <Compile Include="States\TransitionCondition.cs" />
     <Compile Include="TestGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,7 +76,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
-    <Content Include="Content\SpriteData\BlackRabite.txt" />
     <Content Include="OpenTK.dll.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

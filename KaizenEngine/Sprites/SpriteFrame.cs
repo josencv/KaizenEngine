@@ -3,9 +3,20 @@ using Microsoft.Xna.Framework;
 
 namespace KaizenEngine.Sprites
 {
+    /// <summary>
+    /// Represents a frame with sprite information that can be rendered by an SpriteRenderer instance.
+    /// </summary>
     class SpriteFrame
     {
-
+        /// <summary>
+        /// Initializes an instance of the SpriteRenderer class.
+        /// </summary>
+        /// <param name="spriteName">The name of the sprite</param>
+        /// <param name="texture">The texture of the sprite</param>
+        /// <param name="sourceRectangle">The rectangle where is located the sprite in the texture</param>
+        /// <param name="size">The size of the sprite in a Vector2 format</param>
+        /// <param name="origin">The pivot point of the sprite</param>
+        /// <param name="isRotated">Represents whether the sprite is rotated in 90 degrees clockwise</param>
         public SpriteFrame(string spriteName, Texture2D texture, Rectangle sourceRectangle, Vector2 size, Vector2 origin, bool isRotated = false)
         {
             this.Texture = texture;

@@ -6,7 +6,7 @@ namespace KaizenEngine.GameInput
     /// <summary>
     /// Enummerates the posible game input types, like an Xbox controller or the keyboard
     /// </summary>
-    public enum GameInputType { Xbox, Keyboard, GamePad}
+    public enum GameInputType { Keyboard, GamePad}
 
     /// <summary>
     /// Ennumerates the posibles contexts in which a GameInput can be in.
@@ -43,19 +43,23 @@ namespace KaizenEngine.GameInput
     public delegate void StickSignal(float valueX, float valueY);
 
     /// <summary>
-    /// Used to differentiate the left from the right stick from the controller
+    /// Used to differentiate the left from the right stick from the controller.
     /// </summary>
     public enum GameInputStick { Left, Right }
 
     /// <summary>
-    /// The player input index in the game (Not necessarily related to the index of the GamePads connected)
+    /// The player input index in the game (Not necessarily related to the index of the GamePads connected).
     /// </summary>
-    public enum PlayerInputNumber { Player1 = 1, Player2 = 2, Player3 = 3, Player4 = 4 }
+    public enum PlayerIndex { Player1 = 1, Player2 = 2, Player3 = 3, Player4 = 4 }
 
+    /// <summary>
+    /// Represents an input used to control the game. Its primary function is to serve as an abstraction layer for derived inputs.
+    /// Maps derived input states (like Keyboard state or Xna GamePad state) to a unified game state.
+    /// </summary>
     abstract class GameInput
     {
-        protected GameInputType type;                                                   // Keyboard or Xbox
-        protected PlayerInputNumber playerInputNumber;                                  // Player input number to differenciate from other player inputs
+        protected GameInputType type;                                                   // Keyboard or GamePad
+        protected PlayerIndex playerIndex;                                              // Player index. Used to differenciate from other players
         protected GameInputContext currentContext;                                      // The current context in which the input is in
         protected Dictionary<GameInputButton, GameInputButtonState> currentButtonState; // Saves the current state of the GameInput buttons
         protected Dictionary<GameInputButton, float> holdTime;                          // Stores the time elapsed since every button was pressed
@@ -65,10 +69,15 @@ namespace KaizenEngine.GameInput
         public event ButtonSignal PlayerAttackSignal;
         public event StickSignal PlayerMoveSignal;
 
-        public GameInput(GameInputType type, PlayerInputNumber playerInputNumber)
+        /// <summary>
+        /// Initializes a new instance of the GameInput class.
+        /// </summary>
+        /// <param name="type">The type of the derived game input to initialize.</param>
+        /// <param name="playerIndex">The number (or index) of the player in the game. It is not the game controller index.</param>
+        public GameInput(GameInputType type, PlayerIndex playerIndex)
         {
             this.type = type;
-            this.playerInputNumber = playerInputNumber;
+            this.playerIndex = playerIndex;
             this.currentContext = GameInputContext.InGame;  // To be changed to MainMenu or something like that
             currentButtonState = new Dictionary<GameInputButton, GameInputButtonState>();
             currentStickState = new Dictionary<GameInputStick, float[]>();
@@ -78,7 +87,7 @@ namespace KaizenEngine.GameInput
         }
 
         /// <summary>
-        /// Initializes the state for first time use
+        /// Initializes the state for first time use.
         /// </summary>
         private void InitializeControllerState()
         {
@@ -166,7 +175,7 @@ namespace KaizenEngine.GameInput
 
         // Properties ==========================================================
 
-        public PlayerInputNumber PlayerInputNumber { get { return playerInputNumber; } }
+        public PlayerIndex PlayerIndex { get { return playerIndex; } }
 
     }
 }

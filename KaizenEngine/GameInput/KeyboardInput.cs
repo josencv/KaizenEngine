@@ -26,6 +26,9 @@ namespace KaizenEngine.GameInput
         }
     }
 
+    /// <summary>
+    /// Derived class of the GameInput class. Represents a keyboard input
+    /// </summary>
     class KeyboardInput : GameInput
     {
         private Dictionary<Keys, GameInputButton> buttonMapper;          // Keyboard key to GameInputButton mapper dictionary
@@ -33,8 +36,8 @@ namespace KaizenEngine.GameInput
         private KeyboardState currentState;
         private KeyboardState previousState;
 
-        public KeyboardInput(PlayerInputNumber playerInputNumber)
-        : base(GameInputType.Keyboard, playerInputNumber)
+        public KeyboardInput(PlayerIndex playerIndex)
+        : base(GameInputType.Keyboard, playerIndex)
         {
             buttonMapper = new Dictionary<Keys, GameInputButton>();
             axisMapper = new Dictionary<Keys, GameInputAxisValuePair>();
@@ -73,6 +76,9 @@ namespace KaizenEngine.GameInput
             axisMapper.Add(Keys.NumPad6, new GameInputAxisValuePair(GameInputAxis.RightStickX, (float)GameInputAxisValue.MinValue));
         }
 
+        /// <summary>
+        /// Updates the GmaeInput state based of this input state
+        /// </summary>
         public override void UpdateState()
         {
             // Update the keyboard states
